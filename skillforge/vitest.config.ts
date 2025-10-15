@@ -17,4 +17,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Add this to mock Next.js modules
+  define: {
+    'process.env': {},
+  },
 })
