@@ -1,6 +1,15 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 
+// Define the GitHub profile type
+interface GitHubProfile {
+  id: number;
+  login: string;
+  name?: string;
+  email?: string;
+  avatar_url?: string;
+}
+
 export const nextAuth = NextAuth({
   providers: [
     GitHub({
@@ -23,7 +32,7 @@ export const nextAuth = NextAuth({
       }
       
       if (account?.provider === "github") {
-        const githubProfile = profile as any;
+        const githubProfile = profile as unknown as GitHubProfile;
         token.githubId = githubProfile?.id?.toString();
         token.githubLogin = githubProfile?.login;
       }
