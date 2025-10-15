@@ -1,35 +1,36 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const nextAuth = NextAuth({
   providers: [
     GitHub({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      checks: [], // Disable all checks
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   callbacks: {
     jwt: async ({ token, user, account, profile }) => {
-      // Add custom fields to the JWT token
       if (user) {
-        token.role = "user"; // You can set this based on user data
+        token.role = "user";
         token.customField = "some custom value";
-        token.userId = user.id;
+        token.userId = user.id || user.email || "unknown";
         token.isActive = true;
-        // Add any other custom fields you need
       }
       
-      // You can also modify existing fields
       if (account?.provider === "github") {
-        token.githubId = profile?.id;
-        token.githubLogin = profile?.login;
+        const githubProfile = profile as any;
+        token.githubId = githubProfile?.id?.toString();
+        token.githubLogin = githubProfile?.login;
       }
       
       return token;
     },
     session: async ({ session, token }) => {
-      // Pass custom fields from JWT to session
       if (token) {
         session.user.role = token.role as string;
         session.user.customField = token.customField as string;
@@ -43,3 +44,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   debug: true,
 });
+
+export const { handlers, auth, signIn, signOut } = nextAuth;
