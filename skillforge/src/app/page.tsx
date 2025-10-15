@@ -1,8 +1,8 @@
 
 
 import { auth, signIn, signOut } from "@/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";  // Add this import at the top
 
 export default async function Home() {
   const session = await auth();
@@ -39,9 +39,11 @@ export default async function Home() {
                 
                 {session.user?.image && (
                   <div className="mt-2">
-                    <img 
+                   <Image 
                       src={session.user.image} 
                       alt="Profile" 
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-full"
                     />
                   </div>
